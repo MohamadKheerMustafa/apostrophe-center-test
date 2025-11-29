@@ -53,8 +53,8 @@ Make sure you have PHP 8.2+, Composer, and a database ready.
 1. **Clone and install**
 
 ```bash
-git clone <repository-url>
-cd mohamad-kheer-mustafa
+git clone https://github.com/MohamadKheerMustafa/apostrophe-center-test.git
+cd apostrophe-center-test
 composer install
 ```
 
