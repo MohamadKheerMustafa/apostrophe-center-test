@@ -389,6 +389,9 @@ I've included a complete Postman collection ready to use.
 3. Select the collection file
 4. The `base_url` variable is already set to `http://localhost:8000/api/v1` - change it if needed
 
+Or:
+Live Postman Collection : https://documenter.getpostman.com/view/28504650/2sB3dLUX7w
+
 The collection includes all endpoints with example requests. After logging in or registering, the token is automatically saved to the `auth_token` variable, so you don't have to copy-paste it everywhere.
 
 ---
