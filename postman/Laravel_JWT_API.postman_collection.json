@@ -1,0 +1,630 @@
+{
+	"info": {
+		"_postman_id": "laravel-jwt-api-collection",
+		"name": "Laravel JWT Authentication API",
+		"description": "Complete API collection for Laravel JWT Authentication system with role-based access control. Includes all authentication, user management, and role management endpoints.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "laravel-jwt-api"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save token to collection variable if registration is successful",
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.token) {",
+									"        pm.collectionVariables.set(\"auth_token\", jsonData.data.token);",
+									"        pm.collectionVariables.set(\"user_id\", jsonData.data.id);",
+									"        console.log(\"Token saved: \" + jsonData.data.token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"Password123\",\n    \"password_confirmation\": \"Password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new user account. The password must be at least 8 characters, contain uppercase and lowercase letters, and at least one number. Password confirmation is required."
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save token to collection variable",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.token) {",
+									"        pm.collectionVariables.set(\"auth_token\", jsonData.data.token);",
+									"        pm.collectionVariables.set(\"user_id\", jsonData.data.id);",
+									"        pm.collectionVariables.set(\"user_role\", jsonData.data.role);",
+									"        console.log(\"Token saved: \" + jsonData.data.token);",
+									"        console.log(\"User role: \" + jsonData.data.role);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"Password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticate user and receive JWT token. Use this token in Authorization header for protected endpoints."
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save new token to collection variable",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.token) {",
+									"        pm.collectionVariables.set(\"auth_token\", jsonData.data.token);",
+									"        console.log(\"Token refreshed: \" + jsonData.data.token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text",
+								"description": "Can use expired token if within refresh window"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Refresh an expired or about-to-expire JWT token. Works even if token is expired, as long as it's within the refresh window (default: 2 weeks)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						},
+						"description": "Get authenticated user's information. Requires valid JWT token."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Smith\",\n    \"email\": \"john.smith@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/update-profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"update-profile"
+							]
+						},
+						"description": "Update user profile information. You can update name, email, or password. Fields are optional - only include fields you want to update.\n\nTo update password, include:\n- old_password: Current password\n- password: New password\n- password_confirmation: Confirm new password"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile (Change Password)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"old_password\": \"Password123\",\n    \"password\": \"NewPassword456\",\n    \"password_confirmation\": \"NewPassword456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/update-profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"update-profile"
+							]
+						},
+						"description": "Update user password. Requires old_password, new password, and password confirmation. New password must be different from old password."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"Password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/delete-account",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"delete-account"
+							]
+						},
+						"description": "Permanently delete user account. Requires password confirmation for security."
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for user registration, login, token refresh, and profile management."
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "List Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text",
+								"description": "Requires admin token"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users?page=1&per_page=15&search=&order_by=id&order_direction=asc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (default: 1)"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page (1-100, default: 15)"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search in name and email fields",
+									"disabled": true
+								},
+								{
+									"key": "order_by",
+									"value": "id",
+									"description": "Sort column: id, name, email, created_at, updated_at (default: id)"
+								},
+								{
+									"key": "order_direction",
+									"value": "asc",
+									"description": "Sort direction: asc or desc (default: asc)"
+								}
+							]
+						},
+						"description": "Get paginated list of all users. **Admin only endpoint.**\n\n**Query Parameters:**\n- `page`: Page number (default: 1)\n- `per_page`: Items per page, 1-100 (default: 15)\n- `search`: Search term for name and email fields\n- `order_by`: Column to sort by (id, name, email, created_at, updated_at)\n- `order_direction`: Sort direction (asc, desc)\n\n**Examples:**\n- List all users: `GET /users`\n- Search users: `GET /users?search=john`\n- Sort by name: `GET /users?order_by=name&order_direction=desc`\n- Paginated: `GET /users?page=2&per_page=20`"
+					},
+					"response": []
+				},
+				{
+					"name": "List Users (Search)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users?search=john",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "john",
+									"description": "Search term"
+								}
+							]
+						},
+						"description": "Search users by name or email. Admin only."
+					},
+					"response": []
+				},
+				{
+					"name": "List Users (Sorted)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users?order_by=created_at&order_direction=desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "order_by",
+									"value": "created_at",
+									"description": "Sort by creation date"
+								},
+								{
+									"key": "order_direction",
+									"value": "desc",
+									"description": "Newest first"
+								}
+							]
+						},
+						"description": "Get users sorted by creation date (newest first). Admin only."
+					},
+					"response": []
+				}
+			],
+			"description": "User management endpoints. All endpoints require admin role."
+		},
+		{
+			"name": "Roles",
+			"item": [
+				{
+					"name": "Assign Admin Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text",
+								"description": "Requires admin token"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/assign-admin",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"assign-admin"
+							]
+						},
+						"description": "Assign admin role to a user. **Admin only endpoint.**\n\n**Request Body:**\n- `user_id`: Integer, ID of the user to promote to admin (must exist)\n\n**Response:**\nReturns updated user object with admin role.\n\n**Errors:**\n- User already has admin role\n- User not found"
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Admin Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text",
+								"description": "Requires admin token"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/revoke-admin",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"revoke-admin"
+							]
+						},
+						"description": "Revoke admin role from a user (changes to regular user role). **Admin only endpoint.**\n\n**Request Body:**\n- `user_id`: Integer, ID of the user to demote from admin (must exist)\n\n**Response:**\nReturns updated user object with user role.\n\n**Errors:**\n- User already has user role\n- Cannot revoke your own admin role\n- User not found"
+					},
+					"response": []
+				}
+			],
+			"description": "Role management endpoints for assigning and revoking admin roles. All endpoints require admin role."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api/v1",
+			"type": "string",
+			"description": "Base URL for all API endpoints"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string",
+			"description": "JWT authentication token (automatically set after login/register)"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string",
+			"description": "Current user ID (automatically set after login/register)"
+		},
+		{
+			"key": "user_role",
+			"value": "",
+			"type": "string",
+			"description": "Current user role (automatically set after login/register)"
+		}
+	]
+}
+
